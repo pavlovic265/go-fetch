@@ -1,7 +1,7 @@
 
-# Go Errro
+# Go Error
 
-Wrapper around fetch API to handle errors similar like go lang go lang way
+Wrapper around fetch API to handle data and errors, errors are handled similar to go lang as it was used for inspiration
 
 
 ## Usage/Examples
