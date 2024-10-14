@@ -22,10 +22,7 @@ const assetsFetchMock = () => Promise.resolve({
   json: async () => products,
 } as Response);
 const baseUrl = "https://dummy-url.com"
-let fetchMock: any = undefined;
 
-beforeEach(() => {
-});
 
 afterEach(() => {
   jest.restoreAllMocks();
@@ -33,14 +30,22 @@ afterEach(() => {
 
 
 test("goFetch to return json data", async () => {
-  fetchMock = jest.spyOn(global, "fetch")
+  const fetchMock = jest.spyOn(global, "fetch")
     .mockImplementation(assetsFetchMock);
 
-  const { err, jsonData } = await goFetch<Product[]>(baseUrl);
+  const { err, toJson } = await goFetch<Product[]>(baseUrl);
+  expect(err).toBeUndefined()
+  expect(toJson).not.toBeUndefined()
   expect(fetchMock).toHaveBeenCalled();
   expect(fetchMock).toHaveBeenCalledWith(baseUrl);
 
-  expect(err).toBeUndefined()
+  if (err !== undefined) {
+    expect(1).toBe(2)
+    return;
+  }
+
+  const { err: toJsonErr, jsonData } = await toJson();
+  expect(toJsonErr).toBeUndefined()
   expect(jsonData).not.toBeUndefined()
   expect(jsonData).toHaveLength(2)
   expect(jsonData?.[0]).toEqual(products[0])
@@ -48,30 +53,33 @@ test("goFetch to return json data", async () => {
 })
 
 test("goFetch to return valid error", async () => {
-  fetchMock = jest.spyOn(global, "fetch")
+  const fetchMock = jest.spyOn(global, "fetch")
     .mockImplementation(() => {
       throw new Error("fetch faild")
     });
 
-  const { err, jsonData } = await goFetch<Product[]>(baseUrl);
+  const { err, toJson } = await goFetch<Product[]>(baseUrl);
+
   expect(fetchMock).toHaveBeenCalled();
   expect(fetchMock).toHaveBeenCalledWith(baseUrl);
-
-  expect(jsonData).toBeUndefined()
+  expect(err).not.toBeUndefined();
+  expect(toJson).toBeUndefined()
   expect(err).not.toBeUndefined()
   expect(err?.message).toBe("fetch faild")
 })
 
 test("goFetch to return unknown error", async () => {
-  fetchMock = jest.spyOn(global, "fetch")
+  const fetchMock = jest.spyOn(global, "fetch")
     .mockImplementation(() => {
       throw { name: "foo" }
     });
 
-  const { err, jsonData } = await goFetch<Product[]>(baseUrl);
+  const { err, toJson } = await goFetch<Product[]>(baseUrl);
   expect(fetchMock).toHaveBeenCalled();
   expect(fetchMock).toHaveBeenCalledWith(baseUrl);
-
-  expect(jsonData).toBeUndefined()
+  expect(toJson).toBeUndefined()
   expect(err).not.toBeUndefined()
 })
+
+
+
