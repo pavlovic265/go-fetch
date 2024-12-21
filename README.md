@@ -13,34 +13,35 @@ type Product = {
 }
 
 async function example() {
-  const { err: productsErr, toJson: productsToJson  } = await goFetch<{ products: Product[] }>("https://dummyjson.com/products");
-  if (productsErr !== undefined) {
-    // handle products error
-    return;
+  const {response: fetchProducts, err: fetchProductsErr} = await goFetch(fetch('https://dummyjson.com/products'))
+  if(fetchProductsErr!== undefined) {
+    // handle err
+    return
   }
-  const { err: productsJsonErr, josnData: productsData } = await productsToJson()
-  if (productsJsonErr !== undefined) {
-    // handle products json error
+
+  const {response: resProducts, err: resProductsErr} = await goFetch<Products[]>(fetchProducts.json())
+  if(resProductsErr!== undefined) {
+    // handle err
     return;
   }
 
   // handle products
-  console.log("products", jsonData.products)
+  console.log("resProducts", resProducts)
 
-  const { err: productErr, toJson: productToJson } = await goFetch<Product>(`https://dummyjson.com/products/${jsonData.products[0].id}`);
-  if (productErr != undefined) {
-    // handle product error
+  const { response: fetchProduct, err: fetchProductErr }  = await goFetch(fetch(`https://dummyjson.com/products/${jsonData.products[0].id}`);
+  if (fetchProductErr != undefined) {
+    // handle err
     return
   }
 
-  const { err: productsJsonErr, josnData: productData } = await productToJson()
-  if (productJsonErr != undefined) {
-    // handle product json error
-    return
+  const {response: resProduct, err: resProductErr} = await goFetch<Products>(fetchProduct.json())
+  if(resProductErr !== undefined) {
+    // handle err
+    return;
   }
 
   // handle product
-  console.log("productData", productData)
+  console.log("resProduct", resProduct)
 }
 ```
 
